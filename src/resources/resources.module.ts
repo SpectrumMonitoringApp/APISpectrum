@@ -10,7 +10,7 @@ import { MySqlCredentialsModule } from '../my-sql-credentials/my-sql-credentials
 import { ResourceUsersModule } from '../resource-users/resource-users.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Resource]), UsersModule, MySqlCredentialsModule, ResourceUsersModule],
+  imports: [TypeOrmModule.forFeature([Resource]), UsersModule, MySqlCredentialsModule, ResourceUsersModule, MySqlCredentialsModule],
   controllers: [ResourcesController],
   providers: [ResourcesService]
 })

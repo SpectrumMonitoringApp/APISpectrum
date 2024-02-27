@@ -20,4 +20,15 @@ export class ResourceUsersService {
 
     return newResourceUser;
   }
+
+  async userHasAccess(userId: number, resourceId: number) {
+    console.log('resourceId: ', resourceId);
+    console.log('userId: ', userId);
+
+    const resourceUser = await this.resourceUsersRepository.findOneBy({ resourceId, userId });
+
+    console.log('resourceUser:', resourceUser);
+
+    return resourceUser;
+  }
 }

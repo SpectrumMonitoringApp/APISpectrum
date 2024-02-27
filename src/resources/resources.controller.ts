@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Request, Query } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Request, Query, Param } from '@nestjs/common';
 
 import { CreateWorkspaceDto } from '../workspaces/dto/create-workspace.dto';
 import { ResourcesService } from './resources.service';
@@ -19,5 +19,11 @@ export class ResourcesController {
   @Get()
   getUserResources(@Request() req, @Query('workspaceId') workspaceId: number) {
     return this.resourcesService.getUserResources(req.user.id, workspaceId);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Get(':id')
+  getResource(@Request() req, @Param('id') resourceId: number, @Query('workspaceId') workspaceId: number) {
+    return this.resourcesService.getResource(req.user.id, workspaceId, resourceId);
   }
 }

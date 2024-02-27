@@ -20,4 +20,8 @@ export class MySqlCredentialsService {
 
     return newMySqlCredentials;
   }
+
+  async findOne(resourceId: number) {
+    return await this.mySqlCredentialsRepository.findOneBy({ resourceId});
+  }
 }

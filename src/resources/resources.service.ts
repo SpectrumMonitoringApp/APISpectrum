@@ -1,14 +1,14 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { Resource } from './entities/resource.entity';
-import { ResourceType } from './entities/resource.entity';
+import { Resource, ResourceType } from './entities/resource.entity';
 import { UsersService } from '../users/users.service';
 import { CreateMySqlResourceDto } from './dto/create-my-sql-resource.dto';
 import { MySqlCredentialsService } from '../my-sql-credentials/my-sql-credentials.service';
 import { ResourceUsersService } from '../resource-users/resource-users.service';
 import { ResourceUserRole } from '../resource-users/entities/resource-user.entity';
+import { MySqlCredentials } from 'src/my-sql-credentials/entities/my-sql-credentials.entity';
 
 @Injectable()
 export class ResourcesService {
@@ -63,5 +63,21 @@ export class ResourcesService {
     });
 
     return userResources.map(({ id, name, type }) => ({ id, name, type }));
+  }
+
+  async getResource(userId: number, workspaceId: number, resourceId: number) {
+    if (!userId) throw new HttpException(`Invalid userId ${userId} value`, HttpStatus.BAD_REQUEST);
+
+    if (!await this.usersService.hasAccessToWorkspace(userId, +workspaceId)) throw new HttpException(`User ${userId} has no access to workspace ${workspaceId}`, HttpStatus.FORBIDDEN);
+
+    if (!await this.resourceUsersService.userHasAccess(userId, +resourceId)) throw new HttpException(`User ${userId} has no access to resource ${resourceId}`, HttpStatus.FORBIDDEN);
+
+    const resource = await this.resourcesRepository.findOneBy({ id: resourceId });
+
+    let resourceCredentials: any;
+
+    if (resource.type === ResourceType.MYSQL) resourceCredentials = await this.mySqlCredentialsService.findOne(resourceId);
+
+    return { resource, resourceCredentials };
   }
 }

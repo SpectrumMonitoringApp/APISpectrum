@@ -33,8 +33,6 @@ export class UsersService {
   async hasAccessToWorkspace(userId: number, workspaceId: number) {
     const user = await this.usersRepository.findOne({ where: { id: userId }, relations: { workspaces: true } });
 
-    console.log(user);
-
     return user.workspaces.find(({ id }) => id === +workspaceId);
   }
 

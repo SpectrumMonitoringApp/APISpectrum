@@ -24,6 +24,10 @@ export class WorkspacesService {
     return newWorkspace;
   }
 
+  async findOne(workspaceId: number) {
+    return await this.workspacesRepository.findOneBy({ id: workspaceId });
+  }
+
   async getUserWorkspaces(userId: number) {
     if (!userId) throw new HttpException(`Invalid userId ${userId} value`, HttpStatus.BAD_REQUEST);
 
@@ -34,5 +38,15 @@ export class WorkspacesService {
     });
 
     return userWorkspaces.map(({ id, name }) => ({ id, name }));
+  }
+
+  async getWorkspace(userId: number, workspaceId: number) {
+    if (!await this.usersService.hasAccessToWorkspace(userId, workspaceId)) throw new HttpException(`User ${userId} has no access to workspace ${workspaceId}`, HttpStatus.FORBIDDEN);
+
+    const workspace = await this.findOne(workspaceId);
+
+    if (!workspace) throw new HttpException(`Workspace ${workspaceId} value for user ${userId} not found`, HttpStatus.NOT_FOUND);
+
+    return workspace;
   }
 }

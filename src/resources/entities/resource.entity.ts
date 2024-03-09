@@ -10,9 +10,9 @@ import {
 import { ResourceUser } from '../../resource-users/entities/resource-user.entity';
 
 export enum ResourceType {
-  MYSQL = 'MySql',
-  MONGODB = 'MongoDb',
-  S3 = 'S3',
+  MYSQL = 'mySql',
+  MONGODB = 'mongoDb',
+  S3 = 's3',
 }
 
 @Entity({ name: 'Resource' })

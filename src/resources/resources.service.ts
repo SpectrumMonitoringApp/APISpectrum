@@ -9,6 +9,8 @@ import { MySqlCredentialsService } from '../my-sql-credentials/my-sql-credential
 import { ResourceUsersService } from '../resource-users/resource-users.service';
 import { ResourceUserRole } from '../resource-users/entities/resource-user.entity';
 import { MySqlCredentials } from 'src/my-sql-credentials/entities/my-sql-credentials.entity';
+import { UpdateResourceDto } from './dto/update-resource.dto';
+import { UpdateResourceCredentialsDto } from './dto/update-resource-credentials.dto';
 
 @Injectable()
 export class ResourcesService {
@@ -79,5 +81,11 @@ export class ResourcesService {
     if (resource.type === ResourceType.MYSQL) resourceCredentials = await this.mySqlCredentialsService.findOne(resourceId);
 
     return { resource, resourceCredentials };
+  }
+
+  async updateResource(userId: number, workspaceId: number, resourceId: number, resourceData: UpdateResourceDto, resourceCredentialsData: UpdateResourceCredentialsDto) {
+    const { resource, resourceCredentials } = await this.getResource(userId, workspaceId, resourceId);
+
+    return 'OK';
   }
 }

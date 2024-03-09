@@ -1,4 +1,4 @@
-import { Controller, Body, Request, HttpCode, HttpStatus, Post, Get } from '@nestjs/common';
+import { Controller, Body, Request, HttpCode, HttpStatus, Post, Get, Param } from '@nestjs/common';
 
 import { CreateWorkspaceDto } from './dto/create-workspace.dto';
 import { WorkspacesService } from './workspaces.service';
@@ -18,5 +18,11 @@ export class WorkspacesController {
   @Get()
   getUserWorkspaces(@Request() req) {
     return this.workspacesService.getUserWorkspaces(req.user.id);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Get(':id')
+  getWorkspace(@Request() req, @Param('id') workspaceId: number) {
+    return this.workspacesService.getWorkspace(req.user.id, workspaceId);
   }
 }

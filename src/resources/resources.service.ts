@@ -17,16 +17,19 @@ export class ResourcesService {
   constructor(
     @InjectRepository(Resource)
     private resourcesRepository: Repository<Resource>,
+    @InjectRepository(MySqlCredentials)
+    private mySqlCredentialsRepository: Repository<MySqlCredentials>,
     private usersService: UsersService,
     private mySqlCredentialsService: MySqlCredentialsService,
     private resourceUsersService: ResourceUsersService
   ) {
   }
 
-  async create(userId: number, workspaceId: number, name: string, type: ResourceType) {
+  async create(userId: number, workspaceId: number, name: string, type: ResourceType, isActive: boolean, pollInterval: number) {
     if (!await this.usersService.hasAccessToWorkspace(userId, workspaceId)) throw new HttpException(`User ${userId} has no access to workspace ${workspaceId}`, HttpStatus.FORBIDDEN);
 
-    const resource = { workspaceId, name, type };
+    const resource = { workspaceId, name, type, isActive, pollInterval };
+
     const newResource = this.resourcesRepository.create(resource);
 
     await this.resourcesRepository.save(newResource);
@@ -35,7 +38,8 @@ export class ResourcesService {
   }
 
   async createMySqlResource(userId: number, mySqlResource: CreateMySqlResourceDto) {
-    const resource = await this.create(userId, mySqlResource.workspaceId, mySqlResource.name, mySqlResource.type);
+    const resource = await this.create(userId, mySqlResource.workspaceId, mySqlResource.name, mySqlResource.type, mySqlResource.isActive, mySqlResource.pollInterval);
+
     const mySqlCredentials = {
       resourceId: resource.id,
       host: mySqlResource.host,
@@ -44,11 +48,10 @@ export class ResourcesService {
       password: mySqlResource.password,
       databaseName: mySqlResource.databaseName
     };
-    const createdMySqlCredentials = await this.mySqlCredentialsService.create(mySqlCredentials);
 
-    await this.resourceUsersService.create(userId, resource.id, ResourceUserRole.ADMIN);
+    await Promise.all([this.mySqlCredentialsService.create(mySqlCredentials), this.resourceUsersService.create(userId, resource.id, ResourceUserRole.ADMIN)]);
 
-    return createdMySqlCredentials.id;
+    return resource.id;
   }
 
   async getUserResources(userId: number, workspaceId: number) {
@@ -74,7 +77,7 @@ export class ResourcesService {
 
     if (!await this.resourceUsersService.userHasAccess(userId, +resourceId)) throw new HttpException(`User ${userId} has no access to resource ${resourceId}`, HttpStatus.FORBIDDEN);
 
-    const resource = await this.resourcesRepository.findOneBy({ id: resourceId });
+    const resource = await this.resourcesRepository.findOneBy({ id: +resourceId });
 
     let resourceCredentials: any;
 
@@ -86,6 +89,18 @@ export class ResourcesService {
   async updateResource(userId: number, workspaceId: number, resourceId: number, resourceData: UpdateResourceDto, resourceCredentialsData: UpdateResourceCredentialsDto) {
     const { resource, resourceCredentials } = await this.getResource(userId, workspaceId, resourceId);
 
-    return 'OK';
+    for (const [key, value] of Object.entries(resourceData)) {
+      resource[key] = value;
+    }
+
+    for (const [key, value] of Object.entries(resourceCredentialsData)) {
+      resourceCredentials[key] = value;
+    }
+
+    await this.resourcesRepository.save(resource);
+
+    if (resource.type === ResourceType.MYSQL) await this.mySqlCredentialsRepository.save(resourceCredentials);
+
+    return { res: 'OK' };
   }
 }

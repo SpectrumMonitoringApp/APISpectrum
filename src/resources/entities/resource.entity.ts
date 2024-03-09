@@ -33,6 +33,12 @@ export class Resource {
   })
   type: ResourceType;
 
+  @Column({ nullable: false })
+  isActive: boolean;
+
+  @Column()
+  pollInterval: number;
+
   @CreateDateColumn()
   createdAt: Date;
 
@@ -40,5 +46,5 @@ export class Resource {
   updatedAt: Date;
 
   @OneToMany(() => ResourceUser, (resourceUser) => resourceUser.resource)
-  resourceUsers: ResourceUser[]
+  resourceUsers: ResourceUser[];
 }

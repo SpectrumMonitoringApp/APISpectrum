@@ -4,6 +4,7 @@ import { CreateWorkspaceDto } from '../workspaces/dto/create-workspace.dto';
 import { ResourcesService } from './resources.service';
 import { CreateMySqlResourceDto } from './dto/create-my-sql-resource.dto';
 import { UpdateResourceRequestBodyDto } from './dto/update-resource-request-body.dto';
+import { CreateDataStoreDto } from '../data-stores/dto/create-data-store.dto';
 
 @Controller('resources')
 export class ResourcesController {
@@ -33,5 +34,19 @@ export class ResourcesController {
   updateResource(@Request() req, @Param('id') resourceId: number, @Query('workspaceId') workspaceId: number, @Body() updateResourceData: UpdateResourceRequestBodyDto) {
     console.log(updateResourceData);
     return this.resourcesService.updateResource(req.user.id, workspaceId, resourceId, updateResourceData.resource, updateResourceData.resourceCredentials);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Get(':id/data-stores')
+  getDataStores(@Request() req, @Param('id') resourceId: number, @Query('workspaceId') workspaceId: number) {
+    return this.resourcesService.getDataStores(req.user.id, workspaceId, resourceId);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Post(':id/data-stores')
+  createDataStore(@Request() req, @Param('id') resourceId: number, @Query('workspaceId') workspaceId: number, @Body() createDataStore: CreateDataStoreDto) {
+    console.log('createDataStore: ', createDataStore);
+
+    return this.resourcesService.createDataStore(req.user.id, workspaceId, resourceId, createDataStore.name);
   }
 }

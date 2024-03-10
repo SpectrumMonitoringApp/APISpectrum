@@ -6,6 +6,7 @@ import { Workspace } from '../../workspaces/entities/workspace.entity';
 import { Resource } from '../../resources/entities/resource.entity';
 import { ResourceUser } from '../../resource-users/entities/resource-user.entity';
 import { MySqlCredentials } from '../../my-sql-credentials/entities/my-sql-credentials.entity';
+import { DataStore } from '../../data-stores/entities/data-store.entity';
 
 export const dataSourceOptions: DataSourceOptions = {
   type: 'mysql',
@@ -14,7 +15,7 @@ export const dataSourceOptions: DataSourceOptions = {
   username: process.env.MYSQL_DB_ADMIN_USERNAME,
   password: process.env.MYSQL_DB_ADMIN_PASSWORD,
   database: process.env.MYSQL_DB_DATABASE,
-  entities: [User, Workspace, Resource, ResourceUser, MySqlCredentials],
+  entities: [User, Workspace, Resource, ResourceUser, MySqlCredentials, DataStore],
   migrations: ['dist/db/my-sql/migrations/*{.ts,.js}'],
   migrationsTableName: 'Migration',
   migrationsRun: false,

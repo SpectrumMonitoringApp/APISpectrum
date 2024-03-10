@@ -11,6 +11,7 @@ import { ResourcesModule } from './resources/resources.module';
 import { ResourceUsersModule } from './resource-users/resource-users.module';
 import { MySqlCredentialsModule } from './my-sql-credentials/my-sql-credentials.module';
 import { dataSourceOptions } from './db/my-sql/data-source';
+import { DataStoresModule } from './data-stores/data-stores.module';
 
 @Module({
   imports: [
@@ -21,7 +22,8 @@ import { dataSourceOptions } from './db/my-sql/data-source';
     WorkspacesModule,
     ResourcesModule,
     ResourceUsersModule,
-    MySqlCredentialsModule],
+    MySqlCredentialsModule,
+    DataStoresModule],
   controllers: [AppController],
   providers: [AppService]
 })

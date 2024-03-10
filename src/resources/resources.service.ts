@@ -11,6 +11,7 @@ import { ResourceUserRole } from '../resource-users/entities/resource-user.entit
 import { MySqlCredentials } from 'src/my-sql-credentials/entities/my-sql-credentials.entity';
 import { UpdateResourceDto } from './dto/update-resource.dto';
 import { UpdateResourceCredentialsDto } from './dto/update-resource-credentials.dto';
+import { DataStoresService } from '../data-stores/data-stores.service';
 
 @Injectable()
 export class ResourcesService {
@@ -21,7 +22,8 @@ export class ResourcesService {
     private mySqlCredentialsRepository: Repository<MySqlCredentials>,
     private usersService: UsersService,
     private mySqlCredentialsService: MySqlCredentialsService,
-    private resourceUsersService: ResourceUsersService
+    private resourceUsersService: ResourceUsersService,
+    private dataStoresService: DataStoresService
   ) {
   }
 
@@ -102,5 +104,35 @@ export class ResourcesService {
     if (resource.type === ResourceType.MYSQL) await this.mySqlCredentialsRepository.save(resourceCredentials);
 
     return { res: 'OK' };
+  }
+
+  async getDataStores(userId: number, workspaceId: number, resourceId: number) {
+    if (!userId) throw new HttpException(`Invalid userId ${userId} value`, HttpStatus.BAD_REQUEST);
+
+    if (!await this.usersService.hasAccessToWorkspace(userId, +workspaceId)) throw new HttpException(`User ${userId} has no access to workspace ${workspaceId}`, HttpStatus.FORBIDDEN);
+
+    if (!await this.resourceUsersService.userHasAccess(userId, +resourceId)) throw new HttpException(`User ${userId} has no access to resource ${resourceId}`, HttpStatus.FORBIDDEN);
+
+    const resource = await this.resourcesRepository.findOne({
+      relations: { dataStores: true },
+      where: { id: +resourceId }
+    });
+
+    if (!resource) throw new HttpException(`Resource ${resourceId} value for user ${userId} not found`, HttpStatus.NOT_FOUND);
+
+    const { dataStores } = resource;
+
+    return dataStores;
+  }
+
+  async createDataStore(userId: number, workspaceId: number, resourceId: number, dataStoreName: string) {
+    if (!userId) throw new HttpException(`Invalid userId ${userId} value`, HttpStatus.BAD_REQUEST);
+
+    if (!await this.usersService.hasAccessToWorkspace(userId, +workspaceId)) throw new HttpException(`User ${userId} has no access to workspace ${workspaceId}`, HttpStatus.FORBIDDEN);
+
+    if (!await this.resourceUsersService.userHasAccess(userId, +resourceId)) throw new HttpException(`User ${userId} has no access to resource ${resourceId}`, HttpStatus.FORBIDDEN);
+
+    console.log(dataStoreName);
+    return await this.dataStoresService.create(resourceId, dataStoreName);
   }
 }

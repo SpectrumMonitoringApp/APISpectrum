@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 
 import { ResourceUser } from '../../resource-users/entities/resource-user.entity';
+import { DataStore } from '../../data-stores/entities/data-store.entity';
 
 export enum ResourceType {
   MYSQL = 'mySql',
@@ -47,4 +48,7 @@ export class Resource {
 
   @OneToMany(() => ResourceUser, (resourceUser) => resourceUser.resource)
   resourceUsers: ResourceUser[];
+
+  @OneToMany(() => DataStore, (dataStore) => dataStore.resource)
+  dataStores: DataStore[]
 }

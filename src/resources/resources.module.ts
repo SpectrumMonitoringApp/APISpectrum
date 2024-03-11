@@ -14,7 +14,8 @@ import { DataStoresModule } from '../data-stores/data-stores.module';
 @Module({
   imports: [TypeOrmModule.forFeature([Resource]), TypeOrmModule.forFeature([MySqlCredentials]), UsersModule, MySqlCredentialsModule, ResourceUsersModule, MySqlCredentialsModule, DataStoresModule],
   controllers: [ResourcesController],
-  providers: [ResourcesService]
+  providers: [ResourcesService],
+  exports: [ResourcesService]
 })
 export class ResourcesModule {
 }

@@ -12,6 +12,7 @@ import { ResourceUsersModule } from './resource-users/resource-users.module';
 import { MySqlCredentialsModule } from './my-sql-credentials/my-sql-credentials.module';
 import { dataSourceOptions } from './db/my-sql/data-source';
 import { DataStoresModule } from './data-stores/data-stores.module';
+import { InternalComponentsModule } from './internal-components/internal-components.module';
 
 @Module({
   imports: [
@@ -23,7 +24,8 @@ import { DataStoresModule } from './data-stores/data-stores.module';
     ResourcesModule,
     ResourceUsersModule,
     MySqlCredentialsModule,
-    DataStoresModule],
+    DataStoresModule,
+    InternalComponentsModule],
   controllers: [AppController],
   providers: [AppService]
 })

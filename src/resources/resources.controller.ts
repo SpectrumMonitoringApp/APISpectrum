@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Patch, Request, Query, Param } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Patch, Delete, Request, Query, Param } from '@nestjs/common';
 
 import { CreateWorkspaceDto } from '../workspaces/dto/create-workspace.dto';
 import { ResourcesService } from './resources.service';
@@ -48,5 +48,11 @@ export class ResourcesController {
     console.log('createDataStore: ', createDataStore);
 
     return this.resourcesService.createDataStore(req.user.id, workspaceId, resourceId, createDataStore.name);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Delete(':id/data-stores/:dataStoreId')
+  deleteDataStore(@Request() req, @Param('id') resourceId: number, @Param('dataStoreId') dataStoreId: number, @Query('workspaceId') workspaceId: number) {
+    return this.resourcesService.deleteDataStore(req.user.id, workspaceId, resourceId, dataStoreId);
   }
 }

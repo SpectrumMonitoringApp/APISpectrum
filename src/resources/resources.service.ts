@@ -132,7 +132,16 @@ export class ResourcesService {
 
     if (!await this.resourceUsersService.userHasAccess(userId, +resourceId)) throw new HttpException(`User ${userId} has no access to resource ${resourceId}`, HttpStatus.FORBIDDEN);
 
-    console.log(dataStoreName);
     return await this.dataStoresService.create(resourceId, dataStoreName);
+  }
+
+  async deleteDataStore(userId: number, workspaceId: number, resourceId: number, dataStoreId: number) {
+    if (!userId) throw new HttpException(`Invalid userId ${userId} value`, HttpStatus.BAD_REQUEST);
+
+    if (!await this.usersService.hasAccessToWorkspace(userId, +workspaceId)) throw new HttpException(`User ${userId} has no access to workspace ${workspaceId}`, HttpStatus.FORBIDDEN);
+
+    if (!await this.resourceUsersService.userHasAccess(userId, +resourceId)) throw new HttpException(`User ${userId} has no access to resource ${resourceId}`, HttpStatus.FORBIDDEN);
+
+    return await this.dataStoresService.delete(dataStoreId);
   }
 }

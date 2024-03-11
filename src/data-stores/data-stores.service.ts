@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -19,5 +19,13 @@ export class DataStoresService {
     await this.dataStoreRepository.save(dataStore);
 
     return dataStore;
+  }
+
+  async delete(id: number) {
+    const dataStore = await this.dataStoreRepository.findOneBy({ id });
+
+    if (!dataStore) return new HttpException(`DataStore with ${id} not found`, HttpStatus.NOT_FOUND);
+
+    return await this.dataStoreRepository.remove(dataStore);
   }
 }

@@ -12,6 +12,7 @@ import { MySqlCredentials } from 'src/my-sql-credentials/entities/my-sql-credent
 import { UpdateResourceDto } from './dto/update-resource.dto';
 import { UpdateResourceCredentialsDto } from './dto/update-resource-credentials.dto';
 import { DataStoresService } from '../data-stores/data-stores.service';
+import { InfluxDbService } from '../influx-db/influx-db.service';
 
 @Injectable()
 export class ResourcesService {
@@ -23,7 +24,8 @@ export class ResourcesService {
     private usersService: UsersService,
     private mySqlCredentialsService: MySqlCredentialsService,
     private resourceUsersService: ResourceUsersService,
-    private dataStoresService: DataStoresService
+    private dataStoresService: DataStoresService,
+    private influxDbService: InfluxDbService
   ) {
   }
 
@@ -143,5 +145,49 @@ export class ResourcesService {
     if (!await this.resourceUsersService.userHasAccess(userId, +resourceId)) throw new HttpException(`User ${userId} has no access to resource ${resourceId}`, HttpStatus.FORBIDDEN);
 
     return await this.dataStoresService.delete(dataStoreId);
+  }
+
+  async getActiveResourceForPolling() {
+    return this.resourcesRepository.find({
+      where: { isActive: true },
+      relations: { dataStores: true },
+      select: { id: true, type: true, pollInterval: true, dataStores: { id: true, name: true } }
+    });
+  }
+
+  async getResourceRecordCount(userId: number, resourceId: number, workspaceId: number, dataStoreIds: string) {
+    if (!userId) throw new HttpException(`Invalid userId ${userId} value`, HttpStatus.BAD_REQUEST);
+
+    if (!await this.usersService.hasAccessToWorkspace(userId, +workspaceId)) throw new HttpException(`User ${userId} has no access to workspace ${workspaceId}`, HttpStatus.FORBIDDEN);
+
+    if (!await this.resourceUsersService.userHasAccess(userId, +resourceId)) throw new HttpException(`User ${userId} has no access to resource ${resourceId}`, HttpStatus.FORBIDDEN);
+
+    console.log('decodeURI(dataStoreIds): ', decodeURI(dataStoreIds));
+
+    return await this.influxDbService.getResourceInfluxDbData(resourceId, JSON.parse(decodeURI(dataStoreIds)), 'RecordCount');
+  }
+
+  async getResourceVolume(userId: number, resourceId: number, workspaceId: number, dataStoreIds: string) {
+    if (!userId) throw new HttpException(`Invalid userId ${userId} value`, HttpStatus.BAD_REQUEST);
+
+    if (!await this.usersService.hasAccessToWorkspace(userId, +workspaceId)) throw new HttpException(`User ${userId} has no access to workspace ${workspaceId}`, HttpStatus.FORBIDDEN);
+
+    if (!await this.resourceUsersService.userHasAccess(userId, +resourceId)) throw new HttpException(`User ${userId} has no access to resource ${resourceId}`, HttpStatus.FORBIDDEN);
+
+    console.log('decodeURI(dataStoreIds): ', decodeURI(dataStoreIds));
+
+    return await this.influxDbService.getResourceInfluxDbData(resourceId, JSON.parse(decodeURI(dataStoreIds)), 'DataStoreVolume');
+  }
+
+  async getResourceIndexSize(userId: number, resourceId: number, workspaceId: number, dataStoreIds: string) {
+    if (!userId) throw new HttpException(`Invalid userId ${userId} value`, HttpStatus.BAD_REQUEST);
+
+    if (!await this.usersService.hasAccessToWorkspace(userId, +workspaceId)) throw new HttpException(`User ${userId} has no access to workspace ${workspaceId}`, HttpStatus.FORBIDDEN);
+
+    if (!await this.resourceUsersService.userHasAccess(userId, +resourceId)) throw new HttpException(`User ${userId} has no access to resource ${resourceId}`, HttpStatus.FORBIDDEN);
+
+    console.log('decodeURI(dataStoreIds): ', decodeURI(dataStoreIds));
+
+    return await this.influxDbService.getResourceInfluxDbData(resourceId, JSON.parse(decodeURI(dataStoreIds)), 'IndexSize');
   }
 }

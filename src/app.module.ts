@@ -13,6 +13,7 @@ import { MySqlCredentialsModule } from './my-sql-credentials/my-sql-credentials.
 import { dataSourceOptions } from './db/my-sql/data-source';
 import { DataStoresModule } from './data-stores/data-stores.module';
 import { InternalComponentsModule } from './internal-components/internal-components.module';
+import { InfluxDbModule } from './influx-db/influx-db.module';
 
 @Module({
   imports: [
@@ -25,7 +26,8 @@ import { InternalComponentsModule } from './internal-components/internal-compone
     ResourceUsersModule,
     MySqlCredentialsModule,
     DataStoresModule,
-    InternalComponentsModule],
+    InternalComponentsModule,
+    InfluxDbModule],
   controllers: [AppController],
   providers: [AppService]
 })

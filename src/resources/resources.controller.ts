@@ -1,4 +1,16 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Patch, Delete, Request, Query, Param } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Patch,
+  Delete,
+  Request,
+  Query,
+  Param
+} from '@nestjs/common';
 
 import { CreateWorkspaceDto } from '../workspaces/dto/create-workspace.dto';
 import { ResourcesService } from './resources.service';
@@ -15,6 +27,24 @@ export class ResourcesController {
   @Post('/my-sql')
   createMySqlResource(@Request() req, @Body() createMySqlResource: CreateMySqlResourceDto) {
     return this.resourcesService.createMySqlResource(req.user.id, createMySqlResource);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Get(':id/influx-db/record-count')
+  getResourceRecordCount(@Request() req, @Param('id') resourceId: number, @Query('workspaceId') workspaceId: number, @Query('dataStoreIds') dataStoreIds: string) {
+    return this.resourcesService.getResourceRecordCount(req.user.id, resourceId, workspaceId, dataStoreIds);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Get(':id/influx-db/volume')
+  getResourceVolume(@Request() req, @Param('id') resourceId: number, @Query('workspaceId') workspaceId: number, @Query('dataStoreIds') dataStoreIds: string) {
+    return this.resourcesService.getResourceVolume(req.user.id, resourceId, workspaceId, dataStoreIds);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Get(':id/influx-db/index-size')
+  getResourceIndexSize(@Request() req, @Param('id') resourceId: number, @Query('workspaceId') workspaceId: number, @Query('dataStoreIds') dataStoreIds: string) {
+    return this.resourcesService.getResourceIndexSize(req.user.id, resourceId, workspaceId, dataStoreIds);
   }
 
   @HttpCode(HttpStatus.OK)

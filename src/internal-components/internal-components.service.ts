@@ -9,6 +9,8 @@ export class InternalComponentsService {
   }
 
   async getActiveResourcesToPoll() {
-    return [{ id: 1 }, { id: 2 }];
+    const activeResources = await this.resourcesService.getActiveResourceForPolling();
+
+    return activeResources;
   }
 }

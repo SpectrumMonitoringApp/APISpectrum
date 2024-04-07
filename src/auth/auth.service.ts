@@ -30,7 +30,7 @@ export class AuthService {
     return {
       email: user.email,
       fullName: user.fullName,
-      accessToken: await this.jwtService.signAsync(payload)
+      accessToken: await this.jwtService.signAsync(payload, { expiresIn: '2h' })
     };
   }
 }

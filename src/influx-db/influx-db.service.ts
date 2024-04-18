@@ -11,7 +11,9 @@ export class InfluxDbService {
 
   constructor(@InjectRepository(DataStore)
               private resourcesRepository: Repository<DataStore>) {
-    const url = 'http://localhost:8086';
+    // const url = 'http://localhost:8086';
+    // const token = 'MkSDyNlocaNlRdJ';
+    const url = 'http://influxdbloadbalancer-72772441.us-east-1.elb.amazonaws.com';
     const token = 'MkSDyNlocaNlRdJ';
     const org = 'bmykhaylivvv-org';
 

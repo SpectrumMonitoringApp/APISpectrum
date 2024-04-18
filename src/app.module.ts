@@ -14,6 +14,7 @@ import { dataSourceOptions } from './db/my-sql/data-source';
 import { DataStoresModule } from './data-stores/data-stores.module';
 import { InternalComponentsModule } from './internal-components/internal-components.module';
 import { InfluxDbModule } from './influx-db/influx-db.module';
+import { CryptoModule } from './crypto/crypto.module';
 
 @Module({
   imports: [
@@ -27,7 +28,8 @@ import { InfluxDbModule } from './influx-db/influx-db.module';
     MySqlCredentialsModule,
     DataStoresModule,
     InternalComponentsModule,
-    InfluxDbModule],
+    InfluxDbModule,
+    CryptoModule],
   controllers: [AppController],
   providers: [AppService]
 })

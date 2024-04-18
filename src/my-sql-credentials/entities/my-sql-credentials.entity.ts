@@ -18,7 +18,7 @@ export class MySqlCredentials {
   host: string;
 
   @Column()
-  port: number;
+  port: string;
 
   @Column()
   username: string;

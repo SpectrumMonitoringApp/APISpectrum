@@ -1,6 +1,9 @@
+import 'dotenv/config';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { createCipheriv, createDecipheriv } from 'crypto';
+import { promisify } from 'util';
 
 import { Resource, ResourceType } from './entities/resource.entity';
 import { UsersService } from '../users/users.service';
@@ -13,6 +16,7 @@ import { UpdateResourceDto } from './dto/update-resource.dto';
 import { UpdateResourceCredentialsDto } from './dto/update-resource-credentials.dto';
 import { DataStoresService } from '../data-stores/data-stores.service';
 import { InfluxDbService } from '../influx-db/influx-db.service';
+import { CryptoService } from '../crypto/crypto.service';
 
 @Injectable()
 export class ResourcesService {
@@ -25,7 +29,8 @@ export class ResourcesService {
     private mySqlCredentialsService: MySqlCredentialsService,
     private resourceUsersService: ResourceUsersService,
     private dataStoresService: DataStoresService,
-    private influxDbService: InfluxDbService
+    private influxDbService: InfluxDbService,
+    private cryptoService: CryptoService
   ) {
   }
 
@@ -46,11 +51,11 @@ export class ResourcesService {
 
     const mySqlCredentials = {
       resourceId: resource.id,
-      host: mySqlResource.host,
-      port: mySqlResource.port,
-      username: mySqlResource.username,
-      password: mySqlResource.password,
-      databaseName: mySqlResource.databaseName
+      host: this.cryptoService.encrypt(mySqlResource.host),
+      port: this.cryptoService.encrypt(mySqlResource.port),
+      username: this.cryptoService.encrypt(mySqlResource.username),
+      password: this.cryptoService.encrypt(mySqlResource.password),
+      databaseName: this.cryptoService.encrypt(mySqlResource.databaseName)
     };
 
     await Promise.all([this.mySqlCredentialsService.create(mySqlCredentials), this.resourceUsersService.create(userId, resource.id, ResourceUserRole.ADMIN)]);
@@ -85,7 +90,19 @@ export class ResourcesService {
 
     let resourceCredentials: any;
 
-    if (resource.type === ResourceType.MYSQL) resourceCredentials = await this.mySqlCredentialsService.findOne(resourceId);
+    if (resource.type === ResourceType.MYSQL) {
+      const mySqlCredentials = await this.mySqlCredentialsService.findOne(resourceId);
+
+      resourceCredentials = {
+        ...mySqlCredentials,
+        host: this.cryptoService.decrypt(mySqlCredentials.host),
+        port: this.cryptoService.decrypt(mySqlCredentials.port, true),
+        username: this.cryptoService.decrypt(mySqlCredentials.username),
+        password: this.cryptoService.decrypt(mySqlCredentials.password),
+        databaseName: this.cryptoService.decrypt(mySqlCredentials.databaseName)
+      };
+    }
+
 
     return { resource, resourceCredentials };
   }
@@ -98,7 +115,7 @@ export class ResourcesService {
     }
 
     for (const [key, value] of Object.entries(resourceCredentialsData)) {
-      resourceCredentials[key] = value;
+      resourceCredentials[key] = this.cryptoService.encrypt(value);
     }
 
     await this.resourcesRepository.save(resource);

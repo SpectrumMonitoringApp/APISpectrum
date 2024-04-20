@@ -15,6 +15,7 @@ import { DataStoresModule } from './data-stores/data-stores.module';
 import { InternalComponentsModule } from './internal-components/internal-components.module';
 import { InfluxDbModule } from './influx-db/influx-db.module';
 import { CryptoModule } from './crypto/crypto.module';
+import { MongoDbCredentialsModule } from './mongo-db-credentials/mongo-db-credentials.module';
 
 @Module({
   imports: [
@@ -29,7 +30,8 @@ import { CryptoModule } from './crypto/crypto.module';
     DataStoresModule,
     InternalComponentsModule,
     InfluxDbModule,
-    CryptoModule],
+    CryptoModule,
+    MongoDbCredentialsModule],
   controllers: [AppController],
   providers: [AppService]
 })

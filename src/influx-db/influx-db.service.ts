@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import groupBy from 'lodash.groupby';
 import { Injectable } from '@nestjs/common';
 import { InfluxDB, FluxTableMetaData, QueryApi } from '@influxdata/influxdb-client';
@@ -11,11 +12,9 @@ export class InfluxDbService {
 
   constructor(@InjectRepository(DataStore)
               private resourcesRepository: Repository<DataStore>) {
-    // const url = 'http://localhost:8086';
-    // const token = 'MkSDyNlocaNlRdJ';
-    const url = 'http://influxdbloadbalancer-72772441.us-east-1.elb.amazonaws.com';
-    const token = 'MkSDyNlocaNlRdJ';
-    const org = 'bmykhaylivvv-org';
+    const url = process.env.INFLUX_DB_URL;
+    const token = process.env.INFLUX_DB_TOKEN;
+    const org = process.env.INFLUX_DB_ORG;
 
     this.queryApi = new InfluxDB({ url, token }).getQueryApi(org);
   }

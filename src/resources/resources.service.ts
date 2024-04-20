@@ -120,6 +120,8 @@ export class ResourcesService {
 
     await this.resourcesRepository.save(resource);
 
+    if (!Object.keys(resourceCredentialsData).length) return { res: 'OK' };
+
     if (resource.type === ResourceType.MYSQL) await this.mySqlCredentialsRepository.save(resourceCredentials);
 
     return { res: 'OK' };

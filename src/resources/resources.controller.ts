@@ -17,6 +17,7 @@ import { ResourcesService } from './resources.service';
 import { CreateMySqlResourceDto } from './dto/create-my-sql-resource.dto';
 import { UpdateResourceRequestBodyDto } from './dto/update-resource-request-body.dto';
 import { CreateDataStoreDto } from '../data-stores/dto/create-data-store.dto';
+import { CreateMongoDbResourceDto } from './dto/create-mongo-db-resource.dto';
 
 @Controller('resources')
 export class ResourcesController {
@@ -27,6 +28,12 @@ export class ResourcesController {
   @Post('/my-sql')
   createMySqlResource(@Request() req, @Body() createMySqlResource: CreateMySqlResourceDto) {
     return this.resourcesService.createMySqlResource(req.user.id, createMySqlResource);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Post('/mongo-db')
+  createMongoDbResource(@Request() req, @Body() createMongoDbResource: CreateMongoDbResourceDto) {
+    return this.resourcesService.createMongoDbResource(req.user.id, createMongoDbResource);
   }
 
   @HttpCode(HttpStatus.OK)

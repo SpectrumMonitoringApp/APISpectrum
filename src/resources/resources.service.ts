@@ -17,6 +17,9 @@ import { UpdateResourceCredentialsDto } from './dto/update-resource-credentials.
 import { DataStoresService } from '../data-stores/data-stores.service';
 import { InfluxDbService } from '../influx-db/influx-db.service';
 import { CryptoService } from '../crypto/crypto.service';
+import { MongoDbCredentialsService } from '../mongo-db-credentials/mongo-db-credentials.service';
+import { CreateMongoDbResourceDto } from './dto/create-mongo-db-resource.dto';
+import { MongoDbCredentials } from '../mongo-db-credentials/entities/mongo-db-credentials.entity';
 
 @Injectable()
 export class ResourcesService {
@@ -25,12 +28,16 @@ export class ResourcesService {
     private resourcesRepository: Repository<Resource>,
     @InjectRepository(MySqlCredentials)
     private mySqlCredentialsRepository: Repository<MySqlCredentials>,
+    @InjectRepository(MongoDbCredentials)
+    private mongoDbCredentialsRepository: Repository<MongoDbCredentials>,
     private usersService: UsersService,
     private mySqlCredentialsService: MySqlCredentialsService,
     private resourceUsersService: ResourceUsersService,
     private dataStoresService: DataStoresService,
     private influxDbService: InfluxDbService,
-    private cryptoService: CryptoService
+    private cryptoService: CryptoService,
+    private mongoDbCredentialsService: MongoDbCredentialsService
+
   ) {
   }
 
@@ -47,6 +54,7 @@ export class ResourcesService {
   }
 
   async createMySqlResource(userId: number, mySqlResource: CreateMySqlResourceDto) {
+    console.log('mySqlResource: ', mySqlResource);
     const resource = await this.create(userId, mySqlResource.workspaceId, mySqlResource.name, mySqlResource.type, mySqlResource.isActive, mySqlResource.pollInterval);
 
     const mySqlCredentials = {
@@ -59,6 +67,20 @@ export class ResourcesService {
     };
 
     await Promise.all([this.mySqlCredentialsService.create(mySqlCredentials), this.resourceUsersService.create(userId, resource.id, ResourceUserRole.ADMIN)]);
+
+    return resource.id;
+  }
+
+  async createMongoDbResource(userId: number, mongoDbResource: CreateMongoDbResourceDto) {
+    const resource = await this.create(userId, mongoDbResource.workspaceId, mongoDbResource.name, mongoDbResource.type, mongoDbResource.isActive, mongoDbResource.pollInterval);
+
+    const mongoDBCredentials = {
+      resourceId: resource.id,
+      uri: this.cryptoService.encrypt(mongoDbResource.uri),
+      databaseName: this.cryptoService.encrypt(mongoDbResource.databaseName)
+    };
+
+    await Promise.all([this.mongoDbCredentialsService.create(mongoDBCredentials), this.resourceUsersService.create(userId, resource.id, ResourceUserRole.ADMIN)]);
 
     return resource.id;
   }
@@ -103,6 +125,15 @@ export class ResourcesService {
       };
     }
 
+    if (resource.type === ResourceType.MONGODB) {
+      const mongoDbCredentials = await this.mongoDbCredentialsService.findOne(resourceId);
+
+      resourceCredentials = {
+        ...mongoDbCredentials,
+        uri: this.cryptoService.decrypt(mongoDbCredentials.uri),
+        databaseName: this.cryptoService.decrypt(mongoDbCredentials.databaseName)
+      };
+    }
 
     return { resource, resourceCredentials };
   }
@@ -123,6 +154,8 @@ export class ResourcesService {
     if (!Object.keys(resourceCredentialsData).length) return { res: 'OK' };
 
     if (resource.type === ResourceType.MYSQL) await this.mySqlCredentialsRepository.save(resourceCredentials);
+
+    if (resource.type === ResourceType.MONGODB) await this.mongoDbCredentialsRepository.save(resourceCredentials);
 
     return { res: 'OK' };
   }

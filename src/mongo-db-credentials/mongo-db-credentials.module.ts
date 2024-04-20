@@ -1,9 +1,11 @@
 import { Module } from '@nestjs/common';
 import { MongoDbCredentialsService } from './mongo-db-credentials.service';
-import { MongoDbCredentialsController } from './mongo-db-credentials.controller';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { MongoDbCredentials } from './entities/mongo-db-credentials.entity';
 
 @Module({
-  controllers: [MongoDbCredentialsController],
+  imports: [TypeOrmModule.forFeature([MongoDbCredentials])],
   providers: [MongoDbCredentialsService],
+  exports: [MongoDbCredentialsService]
 })
 export class MongoDbCredentialsModule {}

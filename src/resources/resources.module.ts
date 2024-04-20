@@ -12,9 +12,11 @@ import { MySqlCredentials } from '../my-sql-credentials/entities/my-sql-credenti
 import { DataStoresModule } from '../data-stores/data-stores.module';
 import { InfluxDbModule } from '../influx-db/influx-db.module';
 import { CryptoModule } from '../crypto/crypto.module';
+import { MongoDbCredentialsModule } from '../mongo-db-credentials/mongo-db-credentials.module';
+import { MongoDbCredentials } from '../mongo-db-credentials/entities/mongo-db-credentials.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Resource]), TypeOrmModule.forFeature([MySqlCredentials]), UsersModule, MySqlCredentialsModule, ResourceUsersModule, MySqlCredentialsModule, DataStoresModule, InfluxDbModule, CryptoModule],
+  imports: [TypeOrmModule.forFeature([Resource]), TypeOrmModule.forFeature([MySqlCredentials]), UsersModule, MySqlCredentialsModule, ResourceUsersModule, MySqlCredentialsModule, DataStoresModule, InfluxDbModule, CryptoModule, MongoDbCredentialsModule, TypeOrmModule.forFeature([MongoDbCredentials])],
   controllers: [ResourcesController],
   providers: [ResourcesService],
   exports: [ResourcesService]

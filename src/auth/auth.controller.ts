@@ -20,6 +20,13 @@ export class AuthController {
 
   @Public()
   @HttpCode(HttpStatus.OK)
+  @Get('health')
+  authHealth() {
+    return { res: 'OK'};
+  }
+
+  @Public()
+  @HttpCode(HttpStatus.OK)
   @Post('sign-up')
   signUp(@Body() signUpDto: SignUpDto) {
     return this.authService.signUp(signUpDto);

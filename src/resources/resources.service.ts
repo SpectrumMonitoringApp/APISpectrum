@@ -54,7 +54,6 @@ export class ResourcesService {
   }
 
   async createMySqlResource(userId: number, mySqlResource: CreateMySqlResourceDto) {
-    console.log('mySqlResource: ', mySqlResource);
     const resource = await this.create(userId, mySqlResource.workspaceId, mySqlResource.name, mySqlResource.type, mySqlResource.isActive, mySqlResource.pollInterval);
 
     const mySqlCredentials = {
@@ -214,8 +213,6 @@ export class ResourcesService {
 
     if (!await this.resourceUsersService.userHasAccess(userId, +resourceId)) throw new HttpException(`User ${userId} has no access to resource ${resourceId}`, HttpStatus.FORBIDDEN);
 
-    console.log('decodeURI(dataStoreIds): ', decodeURI(dataStoreIds));
-
     return await this.influxDbService.getResourceInfluxDbData(resourceId, JSON.parse(decodeURI(dataStoreIds)), 'RecordCount');
   }
 
@@ -226,8 +223,6 @@ export class ResourcesService {
 
     if (!await this.resourceUsersService.userHasAccess(userId, +resourceId)) throw new HttpException(`User ${userId} has no access to resource ${resourceId}`, HttpStatus.FORBIDDEN);
 
-    console.log('decodeURI(dataStoreIds): ', decodeURI(dataStoreIds));
-
     return await this.influxDbService.getResourceInfluxDbData(resourceId, JSON.parse(decodeURI(dataStoreIds)), 'DataStoreVolume');
   }
 
@@ -237,8 +232,6 @@ export class ResourcesService {
     if (!await this.usersService.hasAccessToWorkspace(userId, +workspaceId)) throw new HttpException(`User ${userId} has no access to workspace ${workspaceId}`, HttpStatus.FORBIDDEN);
 
     if (!await this.resourceUsersService.userHasAccess(userId, +resourceId)) throw new HttpException(`User ${userId} has no access to resource ${resourceId}`, HttpStatus.FORBIDDEN);
-
-    console.log('decodeURI(dataStoreIds): ', decodeURI(dataStoreIds));
 
     return await this.influxDbService.getResourceInfluxDbData(resourceId, JSON.parse(decodeURI(dataStoreIds)), 'IndexSize');
   }

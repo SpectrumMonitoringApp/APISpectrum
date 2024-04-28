@@ -69,7 +69,6 @@ export class ResourcesController {
   @HttpCode(HttpStatus.OK)
   @Patch(':id')
   updateResource(@Request() req, @Param('id') resourceId: number, @Query('workspaceId') workspaceId: number, @Body() updateResourceData: UpdateResourceRequestBodyDto) {
-    console.log(updateResourceData);
     return this.resourcesService.updateResource(req.user.id, workspaceId, resourceId, updateResourceData.resource, updateResourceData.resourceCredentials);
   }
 
@@ -82,8 +81,6 @@ export class ResourcesController {
   @HttpCode(HttpStatus.OK)
   @Post(':id/data-stores')
   createDataStore(@Request() req, @Param('id') resourceId: number, @Query('workspaceId') workspaceId: number, @Body() createDataStore: CreateDataStoreDto) {
-    console.log('createDataStore: ', createDataStore);
-
     return this.resourcesService.createDataStore(req.user.id, workspaceId, resourceId, createDataStore.name);
   }
 
